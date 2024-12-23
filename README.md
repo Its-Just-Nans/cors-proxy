@@ -1,5 +1,7 @@
 # cors-proxy
 
+Quick and dirty cors proxy
+
 ## Usage
 
 ```bash
