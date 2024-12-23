@@ -1,6 +1,6 @@
 [package]
 name = "cors-proxy"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["n4n5 <its.just.n4n5@gmail.com>"]
 description = "Quick and dirty cors proxy"
 documentation = "https://docs.rs/cors-proxy"

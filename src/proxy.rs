@@ -19,6 +19,11 @@ impl Service<Request<Incoming>> for ProxyService {
 }
 
 async fn proxy(req: Request<Incoming>) -> Result<Response<Body>, http::Error> {
+    if req.uri().path() == "/favicon.ico" {
+        return Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body("".into());
+    }
     // Extract the target URL from the request path
     let target_url = match req.uri().path().strip_prefix('/') {
         Some(url) => match req.uri().query() {
@@ -26,9 +31,10 @@ async fn proxy(req: Request<Incoming>) -> Result<Response<Body>, http::Error> {
             None => url.to_string(),
         },
         None => {
+            println!("Invalid URL path {:?}", req.uri().path());
             return Response::builder()
                 .status(StatusCode::BAD_REQUEST)
-                .body("Invalid URL path".into())
+                .body("Invalid URL path".into());
         }
     };
 
@@ -36,16 +42,26 @@ async fn proxy(req: Request<Incoming>) -> Result<Response<Body>, http::Error> {
     let target_uri = match target_url.parse::<Url>() {
         Ok(uri) => uri,
         Err(_) => {
+            println!("Invalid URL format {:?}", target_url);
             return Response::builder()
                 .status(StatusCode::BAD_REQUEST)
-                .body("Invalid URL format".into())
+                .body("Invalid URL format".into());
         }
     };
 
-    println!("Forwarding {} request to: {}", req.method(), target_uri);
+    let text = format!("Forwarding {} request to: {}", req.method(), target_uri);
 
-    let mut forward_req = Reqwest::new(req.method().clone(), target_uri);
+    let mut forward_req = Reqwest::new(req.method().clone(), target_uri.clone());
+
     *forward_req.headers_mut() = req.headers().clone();
+    forward_req.headers_mut().append(
+        "Host",
+        target_uri
+            .host_str()
+            .unwrap_or("localhost")
+            .parse()
+            .unwrap(),
+    );
     *forward_req.body_mut() = Some(Body::wrap(req.into_body().boxed()));
 
     // Handle the response from the target
@@ -54,10 +70,14 @@ async fn proxy(req: Request<Incoming>) -> Result<Response<Body>, http::Error> {
             response
                 .headers_mut()
                 .insert(ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"));
+            println!("{} - {}", text, response.status());
             Ok(response.into())
         }
-        Err(_) => Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body("Failed to fetch the target URL".into()),
+        Err(err) => {
+            println!("{} - {}", text, err);
+            Response::builder()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body("Failed to fetch the target URL".into())
+        }
     }
 }

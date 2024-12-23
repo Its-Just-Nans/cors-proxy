@@ -32,7 +32,7 @@ pub async fn serve_proxy(host: std::net::Ipv4Addr, port: u16) -> Result<(), std:
                     }
                 };
                 let conn = http1::Builder::new()
-                    .serve_connection(TokioIo::new(stream), ProxyService {});
+                    .serve_connection(TokioIo::new(stream), ProxyService);
                 tokio::spawn(async move {
                     if let Err(err) = conn.await {
                         eprintln!("Error serving connection: {}", err);
