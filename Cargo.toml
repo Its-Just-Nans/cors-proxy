@@ -1,0 +1,21 @@
+[package]
+name = "cors-proxy"
+version = "1.0.0"
+authors = ["n4n5 <its.just.n4n5@gmail.com>"]
+description = "Quick and dirty cors proxy"
+documentation = "https://docs.rs/cors-proxy"
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/Its-Just-Nans/cors-proxy"
+repository = "https://github.com/Its-Just-Nans/cors-proxy"
+keywords = ["cors", "proxy"]
+
+[dependencies]
+tokio = { version = "1.42.0", features = ["full"] }
+hyper = { version = "1.5.2", features = ["full"] }
+http = "1.2.0"
+clap = { version = "4.5.23", features = ["derive"] }
+proc-macro2 = "1.0.92"
+hyper-util = { version = "0.1.10", features = ["full"] }
+reqwest = "0.12.9"
+http-body-util = "0.1.2"
