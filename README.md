@@ -1,4 +1,4 @@
-# cors-proxy
+# cors-proxy [![crates.io version](https://img.shields.io/crates/v/cors-proxy)](https://crates.io/crates/cors-proxy) ![crates.io downloads](https://img.shields.io/crates/d/cors-proxy)
 
 Quick and dirty cors proxy
 
